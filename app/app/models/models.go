@@ -1,16 +1,27 @@
 package models
 
 import (
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
+type Profile struct {
+	Name     string
+	Email    string
+	MobileNo int
+}
+
 type User struct {
 	gorm.Model
-	Name   string
-	Email  string
-	Orders []Order
-	Type   string
+	Orders  []Order
+	Profile Profile `gorm:"embedded"`
+}
+
+type DeliveryPerson struct {
+	gorm.Model
+	Profile       Profile `gorm:"embedded"`
+	CurrentOrders []Order
+	CurrentArea   string
+	CurrentLoc    string
 }
 
 type Cookie struct {
@@ -22,15 +33,8 @@ type Cookie struct {
 
 type Order struct {
 	gorm.Model
-	Cookies           []Cookie
-	Buyer             User
-	DeliveryAgent     User
+	Cookies           []Cookie `gorm:"many2many:cookie_orders"`
+	UserID            int
+	DeliveryPersonID  int
 	EstimatedDelivery int
-}
-
-var db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-
-func main() {
-	// db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-
 }
