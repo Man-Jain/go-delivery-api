@@ -6,8 +6,27 @@
 module:testrunner
 # module:jobs
 
-
+# Index
 GET     /                                       App.Index
+
+# Cookies Endpoints
+GET     /cookies                                   App.GetCookies
+POST     /cookies                                   App.CreateCookie
+GET     /cookies/:id                                   App.GetCookie
+
+
+# Authentication Endpoints
+
+GET      /login                                      App.Login
+POST     /register                                   App.Register
+GET      /user/:id                                   App.GetUser
+
+# Order Endpoints
+
+GET     /orders                                     App.GetOrders
+POST    /orders                                     App.CreateOrder
+GET     /order/:id                                  App.GetOrder
+
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

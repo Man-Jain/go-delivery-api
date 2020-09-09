@@ -20,4 +20,6 @@ require (
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/stack.v0 v0.0.0-20141108040640-9b43fcefddd0 // indirect
+	gorm.io/driver/sqlite v1.1.1
+	gorm.io/gorm v1.20.0
 )
