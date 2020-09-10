@@ -10,22 +10,23 @@ module:testrunner
 GET     /                                       App.Index
 
 # Cookies Endpoints
-GET     /cookies                                   App.GetCookies
-POST     /cookies                                   App.CreateCookie
-GET     /cookies/:id                                   App.GetCookie
+GET     /cookies                                   Cookies.GetCookies
+POST     /cookies                                   Cookies.CreateCookie
+GET     /cookies/:id                                   Cookies.GetCookie
 
 
 # Authentication Endpoints
 
-GET      /login                                      App.Login
-POST     /register                                   App.Register
-GET      /user/:id                                   App.GetUser
+GET      /login                                      Users.Login
+POST     /register                                   Users.Register
+GET      /users                                   Users.GetUsers
+GET      /users/:id                                   Users.GetUser
 
 # Order Endpoints
 
-GET     /orders                                     App.GetOrders
-POST    /orders                                     App.CreateOrder
-GET     /order/:id                                  App.GetOrder
+GET     /orders                                     Orders.GetOrders
+POST    /orders                                     Orders.CreateOrder
+GET     /orders/:id                                  Orders.GetOrder
 
 
 # Ignore favicon requests

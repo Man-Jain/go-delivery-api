@@ -1,23 +1,20 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type Profile struct {
 	Name     string
 	Email    string
 	MobileNo int
+	Password string
 }
 
 type User struct {
-	gorm.Model
+	ID      uint
 	Orders  []Order
 	Profile Profile `gorm:"embedded"`
 }
 
 type DeliveryPerson struct {
-	gorm.Model
+	ID            uint
 	Profile       Profile `gorm:"embedded"`
 	CurrentOrders []Order
 	CurrentArea   string
@@ -25,14 +22,14 @@ type DeliveryPerson struct {
 }
 
 type Cookie struct {
-	gorm.Model
+	ID          uint
 	Name        string
 	Description string
 	Price       int
 }
 
 type Order struct {
-	gorm.Model
+	ID                uint
 	Cookies           []Cookie `gorm:"many2many:cookie_orders"`
 	UserID            int
 	DeliveryPersonID  int
