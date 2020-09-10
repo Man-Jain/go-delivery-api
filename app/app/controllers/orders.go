@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"app/app/models"
+	"net/http"
 
 	"github.com/revel/revel"
 )
@@ -23,7 +24,7 @@ func (c *Orders) GetOrders() revel.Result {
 // GetOrdersUser get all current orders of a user
 func (c *Orders) GetOrdersUser(userid uint) revel.Result {
 	orders := []models.Order{}
-	result := DB.Where("userid = ?", userid).Find(&orders)
+	result := DB.Where("user_id = ?", userid).Find(&orders)
 	println("the orders are", result)
 	println(result.RowsAffected)
 	return c.RenderJSON(orders)
@@ -32,7 +33,7 @@ func (c *Orders) GetOrdersUser(userid uint) revel.Result {
 // GetOrdersDeliveryAgent get all current orders of delivery agent
 func (c *Orders) GetOrdersDeliveryAgent(deliverypersonid uint) revel.Result {
 	orders := []models.Order{}
-	result := DB.Where("deliverypersonid = ?", deliverypersonid).Find(&orders)
+	result := DB.Where("delivery_person_id = ?", deliverypersonid).Find(&orders)
 	println("the orders are", result)
 	println(result.RowsAffected)
 	return c.RenderJSON(orders)
@@ -40,7 +41,50 @@ func (c *Orders) GetOrdersDeliveryAgent(deliverypersonid uint) revel.Result {
 
 // CreateOrder create a new order
 func (c *Orders) CreateOrder() revel.Result {
-	return c.RenderJSON(cookies)
+	var order, sameAreaOrder models.Order
+	var jsonData map[string]interface{}
+	var deliveryPerson models.DeliveryPerson
+
+	c.Params.BindJSON(&jsonData)
+
+	deliveryArea := jsonData["delivery_area"].(uint)
+	if sameResult := DB.Where("estimated_delivery = ?", deliveryArea).First(&sameAreaOrder); sameResult.Error == nil {
+		deliverPerson := models.DeliveryPerson{}
+		deliveryPersonID := sameAreaOrder.DeliveryPersonID
+		if result := DB.First(&deliveryPerson, deliveryPersonID); result.Error == nil {
+			estimatedDelivery := deliveryArea - deliverPerson.CurrentLoc
+			order.CookieID = jsonData["cookie_id"].(uint)
+			order.Quantity = jsonData["quantity"].(uint)
+			order.UserID = jsonData["user_id"].(uint)
+			order.DeliveryPersonID = deliveryPersonID
+			order.EstimatedDelivery = estimatedDelivery
+			order.Status = "En Route"
+			order.DeliveryArea = deliveryArea
+
+			if result := DB.Create(&order); result.Error != nil {
+				c.Response.Status = http.StatusBadRequest
+				return c.RenderJSON("Cannot Create Order")
+			}
+		}
+	} else {
+		var deliveryPersonID uint = 1
+		var estimatedDelivery uint = 32
+
+		order.CookieID = jsonData["cookie_id"].(uint)
+		order.Quantity = jsonData["quantity"].(uint)
+		order.UserID = jsonData["user_id"].(uint)
+		order.DeliveryPersonID = deliveryPersonID
+		order.EstimatedDelivery = estimatedDelivery
+		order.Status = "En Route"
+		order.DeliveryArea = deliveryArea
+
+		if result := DB.Create(&order); result.Error != nil {
+			c.Response.Status = http.StatusBadRequest
+			return c.RenderJSON("Cannot Create Order")
+		}
+	}
+
+	return c.RenderJSON(order)
 }
 
 // GetOrder returns a single order object

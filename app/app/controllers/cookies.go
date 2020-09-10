@@ -11,12 +11,6 @@ type Cookies struct {
 	App
 }
 
-var cookies = []Cookie{
-	Cookie{"Chocolate", "This is chocolate cookie", 123},
-	Cookie{"Cranberry", "This is Cranberry cookie", 123},
-	Cookie{"Blueberry", "This is Blueberry cookie", 12123},
-}
-
 // GetCookies is used to get all cookies json
 func (c *Cookies) GetCookies() revel.Result {
 	cookies := []models.Cookie{}
@@ -30,17 +24,18 @@ func (c *Cookies) CreateCookie() revel.Result {
 	var jsonData map[string]interface{}
 	c.Params.BindJSON(&jsonData)
 
+	println("This is the data", jsonData["name"])
 	cookie := models.Cookie{
 		Name:        jsonData["name"].(string),
 		Description: jsonData["description"].(string),
-		Price:       jsonData["price"].(uint),
-		Quantity:    jsonData["quantity"].(uint),
+		Price:       uint(jsonData["price"].(float64)),
+		Quantity:    uint(jsonData["quantity"].(float64)),
 	}
 
 	result := DB.Create(&cookie)
-	println(result)
+	println(result.RowsAffected)
 
-	return c.RenderJSON(cookie)
+	return c.RenderJSON(jsonData)
 }
 
 // GetCookie is used to get a single cookie object

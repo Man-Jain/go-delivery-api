@@ -6,31 +6,12 @@ import (
 	"github.com/revel/revel"
 )
 
+// Users Controller with embedded App
 type Users struct {
 	App
 }
 
-// User Controllers
-func (c *Users) Login() revel.Result {
-	return c.RenderJSON(cookies)
-}
-
-func (c *Users) Register() revel.Result {
-	var jsonData map[string]interface{}
-	c.Params.BindJSON(&jsonData)
-
-	user := models.User{
-		Profile: models.Profile{
-			Email:    jsonData["email"].(string),
-			Password: jsonData["password"].(string),
-		},
-	}
-
-	result := DB.Create(&user)
-	println(result)
-	return c.RenderJSON(jsonData)
-}
-
+// GetUsers return all users of application
 func (c *Users) GetUsers() revel.Result {
 	users := []models.User{}
 	result := DB.Find(&users)
@@ -39,6 +20,7 @@ func (c *Users) GetUsers() revel.Result {
 	return c.RenderJSON(users)
 }
 
+// GetUser return a single user object
 func (c *Users) GetUser(id int) revel.Result {
 	user := models.User{}
 	result := DB.First(&user, id)
