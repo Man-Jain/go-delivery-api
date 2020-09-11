@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"app/app/models"
 	"net/http"
 
 	"github.com/revel/revel"
-	"golang.org/x/crypto/bcrypt"
 
 	"app/app/services"
 )
@@ -32,35 +30,21 @@ func (c *Auth) Login() revel.Result {
 	return c.RenderJSON(map[string]string{"accessToken": accessToken, "refreshToken": refreshToken})
 }
 
-// Register creates a new user and
-func (c *Auth) Register() revel.Result {
+// DeliveryLogin creates a Token for user and Logs him in
+func (c *Auth) DeliveryLogin() revel.Result {
 	var jsonData map[string]interface{}
 	c.Params.BindJSON(&jsonData)
 
-	userType := jsonData["user_type"].(string)
+	email := jsonData["email"].(string)
 	password := jsonData["password"].(string)
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
-	if userType == "customer" {
-		obj := models.User{
-			Profile: models.Profile{
-				Email:    jsonData["email"].(string),
-				Password: hashedPassword,
-			},
-		}
-		result := services.DB.Create(&obj)
-		println(result)
-	} else {
-		obj := models.DeliveryPerson{
-			Profile: models.Profile{
-				Email:    jsonData["email"].(string),
-				Password: hashedPassword,
-			},
-		}
-		result := services.DB.Create(&obj)
-		println(result)
+	accessToken, refreshToken, err := services.DeliveryLogIn(email, password)
+	if err != nil {
+		c.Response.Status = http.StatusBadRequest
+		return c.RenderJSON(map[string]string{"status": "Invalid Credentials"})
 	}
-	return c.RenderJSON(jsonData)
+
+	return c.RenderJSON(map[string]string{"accessToken": accessToken, "refreshToken": refreshToken})
 }
 
 // RefreshToken returns accessToken using refreshToken

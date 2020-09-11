@@ -17,12 +17,14 @@ GET      /cookies/:id                                 Cookies.GetCookie
 # Auth Endpoints
 
 POST      /login                                      Auth.Login
-POST      /register                                   Auth.Register
+POST      /login/delivery                             Auth.DeliveryLogin
 GET       /refresh                                    Auth.RefreshToken
 
 # User Endpoints
 GET      /users                                       Users.GetUsers
 GET      /users/:id                                   Users.GetUser
+POST      /register                                   Users.Register
+POST      /register/root                              Users.RegisterRoot
 
 # Delivery People Endpoints
 GET      /deliverypeople                              Delivery.GetDeliveryPeople
