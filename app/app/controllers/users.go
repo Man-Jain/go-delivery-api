@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/revel/revel"
+	"golang.org/x/crypto/bcrypt"
 
+	"app/app/models"
 	"app/app/services"
 )
 
@@ -57,40 +59,87 @@ func (c *Users) GetUser(id uint) revel.Result {
 	return c.RenderJSON(user)
 }
 
-// Register creates a new user and
+// Register creates a new user
 func (c *Users) Register() revel.Result {
 	var jsonData map[string]interface{}
 	c.Params.BindJSON(&jsonData)
 
-	userType := jsonData["user_type"].(string)
+	userType, oku := jsonData["user_type"].(string)
+	password, okp := jsonData["password"].(string)
+	email, oke := jsonData["email"].(string)
+	if !oku || !okp || !oke {
+		return c.RenderJSON(map[string]string{"status": "Invalid Parameters"})
+	}
+
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if userType == "customer" {
-		_, err := services.InsertUser(jsonData)
+		obj := models.User{
+			Profile: models.Profile{
+				Email:    email,
+				Password: hashedPassword,
+			},
+		}
+		obj.Validate(c.Validation)
+		if c.Validation.HasErrors() {
+			return c.RenderJSON(map[string]string{"status": "Invalid Parameters"})
+		}
+		_, err := services.InsertUser(obj)
 		if err != nil {
 			return c.RenderJSON(map[string]string{"status": "Invalid Request"})
 		}
+
+		return c.RenderJSON(obj)
 	} else {
-		_, err := services.InsertDeliveryPerson(jsonData)
+
+		obj := models.DeliveryPerson{
+			Profile: models.Profile{
+				Email:    email,
+				Password: hashedPassword,
+			},
+		}
+		obj.Validate(c.Validation)
+		if c.Validation.HasErrors() {
+			return c.RenderJSON(map[string]string{"status": "Invalid Parameters"})
+		}
+		_, err := services.InsertDeliveryPerson(obj)
 		if err != nil {
 			return c.RenderJSON(map[string]string{"status": "Invalid Request"})
 		}
+
+		return c.RenderJSON(obj)
 	}
-	return c.RenderJSON(jsonData)
 }
 
-// RegisterRoot creates a new user and
+// RegisterRoot creates a new root user
 func (c *Users) RegisterRoot() revel.Result {
 	isAllowed, err := services.ValidateUser(c.Request.Header.Get("Authorization"), "root")
 	if !isAllowed {
-		return c.RenderJSON(map[string]string{"status": "Not Authorised"})
+		// return c.RenderJSON(map[string]string{"status": "Not Authorised"})
 	}
 
 	var jsonData map[string]interface{}
 	c.Params.BindJSON(&jsonData)
 
-	user, err := services.InsertRootUser(jsonData)
+	password := jsonData["password"].(string)
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	obj := models.User{
+		Profile: models.Profile{
+			Email:    jsonData["email"].(string),
+			Password: hashedPassword,
+		},
+		Root: true,
+	}
+
+	_, err = services.InsertRootUser(obj)
+	obj.Validate(c.Validation)
+	if c.Validation.HasErrors() {
+		return c.RenderJSON(map[string]string{"status": "Invalid Parameters"})
+	}
+
 	if err != nil {
 		return c.RenderJSON(map[string]string{"status": "Invalid Request"})
 	}
-	return c.RenderJSON(user)
+	return c.RenderJSON(obj)
 }

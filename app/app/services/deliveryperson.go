@@ -2,8 +2,6 @@ package services
 
 import (
 	"app/app/models"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 // QueryAllDeliveryPeople return all users of application
@@ -24,16 +22,8 @@ func QueryDeliveryPerson(id uint) (*models.DeliveryPerson, error) {
 }
 
 // InsertDeliveryPerson will insert a delivery person in db
-func InsertDeliveryPerson(jsonData map[string]interface{}) (*models.DeliveryPerson, error) {
-	password := jsonData["password"].(string)
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func InsertDeliveryPerson(obj models.DeliveryPerson) (*models.DeliveryPerson, error) {
 
-	obj := models.DeliveryPerson{
-		Profile: models.Profile{
-			Email:    jsonData["email"].(string),
-			Password: hashedPassword,
-		},
-	}
 	if result := DB.Create(&obj); result.Error != nil {
 		return &obj, result.Error
 	}

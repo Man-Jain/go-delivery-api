@@ -5,6 +5,7 @@ import (
 
 	"github.com/revel/revel"
 
+	"app/app/models"
 	"app/app/services"
 )
 
@@ -27,9 +28,18 @@ func (c *Cookies) GetCookies() revel.Result {
 func (c *Cookies) CreateCookie() revel.Result {
 	var jsonData map[string]interface{}
 	c.Params.BindJSON(&jsonData)
+	cookie := models.Cookie{
+		Name:        jsonData["name"].(string),
+		Description: jsonData["description"].(string),
+		Price:       uint(jsonData["price"].(float64)),
+		Quantity:    uint(jsonData["quantity"].(float64)),
+	}
+	cookie.Validate(c.Validation)
+	if c.Validation.HasErrors() {
+		return c.RenderJSON(map[string]string{"status": "Invalid Parameters"})
+	}
+	_, err := services.InsertCookie(cookie)
 
-	println("This is the data", jsonData["name"])
-	_, err := services.InsertCookie(jsonData)
 	if err != nil {
 		c.Response.Status = http.StatusBadRequest
 		return c.RenderJSON(map[string]string{"status": "Invalid Request"})

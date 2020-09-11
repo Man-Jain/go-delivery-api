@@ -73,7 +73,7 @@ func DeliveryLogIn(email string, password string) (string, string, error) {
 
 	if err = bcrypt.CompareHashAndPassword(dp.Profile.Password, []byte(password)); err == nil {
 		// Creating Access Token
-		expirationTime := time.Now().Add(15 * time.Minute)
+		expirationTime := time.Now().Add(1500 * time.Minute)
 
 		claims := jwt.MapClaims{
 			"ID":        dp.ID,
@@ -168,7 +168,7 @@ func ValidateUser(token string, userType string) (bool, error) {
 	if userType == "root" {
 		user := models.User{}
 
-		if result := DB.Where("id = ? and root = 1", userEmail).First(&user); result.Error != nil {
+		if result := DB.Where("id = ? and root = 1", id).First(&user); result.Error != nil {
 			return false, result.Error
 		}
 
