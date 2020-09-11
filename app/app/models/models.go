@@ -5,7 +5,7 @@ type Profile struct {
 	Name     string
 	Email    string
 	MobileNo uint
-	Password string
+	Password []byte
 }
 
 // User model is for customers objects
@@ -13,6 +13,7 @@ type User struct {
 	ID      uint
 	Orders  []Order
 	Profile Profile `gorm:"embedded"`
+	Root    bool
 }
 
 // DeliveryPerson model is for Delivery Person objects
@@ -20,17 +21,17 @@ type DeliveryPerson struct {
 	ID            uint
 	Profile       Profile `gorm:"embedded"`
 	CurrentOrders []Order
-	CurrentArea   uint
-	CurrentLoc    uint
+	// OrderArea     uint
+	CurrentLoc uint
 }
 
 // Cookie model is for Cookie Objects
 type Cookie struct {
-	ID          uint
-	Name        string
-	Description string
-	Price       uint
-	Quantity    uint
+	ID                uint
+	Name, Description string
+	Price             uint
+	Quantity          uint
+	Orders            []Order
 }
 
 // Order model is for Order Objects
@@ -42,5 +43,5 @@ type Order struct {
 	DeliveryPersonID  uint
 	EstimatedDelivery uint
 	Status            string
-	DeliveryLocation  uint
+	DeliveryArea      uint
 }

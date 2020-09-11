@@ -7,32 +7,34 @@ module:testrunner
 # module:jobs
 
 # Index
-GET      /                                           App.Index
+GET      /                                            App.Index
 
 # Cookies Endpoints
-GET      /cookies                                    Cookies.GetCookies
-POST     /cookies                                    Cookies.CreateCookie
-GET      /cookies/:id                                Cookies.GetCookie
+GET      /cookies                                     Cookies.GetCookies
+POST     /cookies                                     Cookies.CreateCookie
+GET      /cookies/:id                                 Cookies.GetCookie
 
 # Auth Endpoints
 
-GET      /login                                      Auth.Login
-POST     /register                                   Auth.Register
+POST      /login                                      Auth.Login
+POST      /register                                   Auth.Register
+GET       /refresh                                    Auth.RefreshToken
 
 # User Endpoints
-GET      /users                                      Users.GetUsers
-GET      /users/:id                                  Users.GetUser
+GET      /users                                       Users.GetUsers
+GET      /users/:id                                   Users.GetUser
 
 # Delivery People Endpoints
-GET      /deliverypeople                             Delivery.GetDeliveryPeople
-GET      /deliverypeople/:id                         Delivery.GetDeliveryPerson
+GET      /deliverypeople                              Delivery.GetDeliveryPeople
+GET      /deliverypeople/:id                          Delivery.GetDeliveryPerson
+GET      /deliverypeople/orders/status/:id            Delivery.CompleteDelivery
 
 # Order Endpoints
 
-GET     /orders                                      Orders.GetOrders
-POST    /orders                                      Orders.CreateOrder
-GET     /orders/:id                                  Orders.GetOrder
-GET     /orders/users/:userid                        Orders.GetOrdersUser
+GET     /orders                                       Orders.GetOrders
+POST    /orders                                       Orders.CreateOrder
+GET     /orders/:id                                   Orders.GetOrder
+GET     /orders/users/:userid                         Orders.GetOrdersUser
 GET     /orders/deliveryperson/:deliverypersonid                                  Orders.GetOrdersDeliveryAgent
 
 

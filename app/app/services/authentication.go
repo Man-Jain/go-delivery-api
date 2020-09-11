@@ -5,8 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"app/app/controllers"
-
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,7 +25,7 @@ func LogIn(email string, password string) (string, string, error) {
 
 	user := models.User{}
 
-	if result := controllers.DB.Where("email = ?", email).First(&user); result.Error != nil {
+	if result := DB.Where("email = ?", email).First(&user); result.Error != nil {
 		return "", "", result.Error
 	}
 
@@ -68,7 +66,7 @@ func LogIn(email string, password string) (string, string, error) {
 }
 
 // RefreshToken used for creating access token from refresh token
-func RefreshToken(token string) (string, error) {
+func GetRefreshToken(token string) (string, error) {
 	var accessTokenString string
 	claims := &Claims{}
 
@@ -100,7 +98,8 @@ func RefreshToken(token string) (string, error) {
 	return accessTokenString, nil
 }
 
-func validateToken(token string) (string, error) {
+// ValidateToken validates token and returns email
+func ValidateToken(token string) (string, error) {
 	claims := Claims{}
 
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
@@ -108,10 +107,6 @@ func validateToken(token string) (string, error) {
 	})
 
 	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			return "", err
-		}
-
 		return "", err
 	}
 	if !tkn.Valid {

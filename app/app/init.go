@@ -1,7 +1,7 @@
 package app
 
 import (
-	"app/app/controllers"
+	"app/app/services"
 
 	"github.com/revel/revel"
 )
@@ -36,7 +36,7 @@ func init() {
 	// revel.DevMode and revel.RunMode only work inside of OnAppStart. See Example Startup Script
 	// ( order dependent )
 	// revel.OnAppStart(ExampleStartupScript)
-	revel.OnAppStart(controllers.InitDB)
+	revel.OnAppStart(services.InitDB)
 	// revel.OnAppStart(FillCache)
 }
 
