@@ -141,7 +141,7 @@ func InsertOrder(userID uint, cookieID uint, quantity uint) (*models.Order, erro
 			order.Status = "EnRoute"
 			order.DeliveryArea = deliveryArea
 
-			if result := tx.First(&deliveryPerson, deliveryPersonID); result.Error == nil {
+			if result := tx.First(&deliveryPerson, deliveryPersonID); result.Error != nil {
 				println("This is an error")
 				return result.Error
 			}

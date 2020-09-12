@@ -61,11 +61,6 @@ func (c *Delivery) GetDeliveryPerson(id uint) revel.Result {
 
 // CompleteDelivery is used to get a single delivery person object
 func (c *Delivery) CompleteDelivery(id int) revel.Result {
-	_, _, err := services.ValidateToken(c.Request.Header.Get("Authorization"))
-	if err != nil {
-		return c.RenderJSON(map[string]string{"status": "Invalid Auth Credentials"})
-	}
-
 	isAllowed, err := services.ValidateUser(c.Request.Header.Get("Authorization"), "delivery_person")
 	if !isAllowed {
 		return c.RenderJSON(map[string]string{"status": "Not Authorised"})
@@ -77,5 +72,5 @@ func (c *Delivery) CompleteDelivery(id int) revel.Result {
 		return c.RenderJSON(map[string]string{"status": "Invalid Request"})
 	}
 
-	return c.RenderJSON("Successfully Delivered")
+	return c.RenderJSON(map[string]string{"status": "Successfully Delivered"})
 }

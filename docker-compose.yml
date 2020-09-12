@@ -17,6 +17,8 @@ services:
     depends_on:
       - db
     volumes: 
-        - ./:/delivery-api/
+      - ./:/delivery-api/
+    environment:
+      - PROD=$PROD
 volumes:
     database_data:

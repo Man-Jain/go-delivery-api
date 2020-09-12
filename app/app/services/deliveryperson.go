@@ -2,6 +2,7 @@ package services
 
 import (
 	"app/app/models"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -37,31 +38,38 @@ func InsertDeliveryPerson(obj models.DeliveryPerson) (*models.DeliveryPerson, er
 func UpdateDelivery(id int) (*models.Order, error) {
 	order := models.Order{}
 	if result := DB.First(&order, id); result.Error != nil {
+		println("This is the error 0")
 		return &order, result.Error
 	}
+	if order.Status == "Delivered" {
+		println("Already Delivered")
+		return &order, errors.New("Already Delivered")
+	}
+	println(order.ID, order.Status)
 	order.Status = "Delivered"
+	println(order.ID, order.Status)
 
 	deliveryPerson := models.DeliveryPerson{}
-	if result := DB.First(&deliveryPerson, order.DeliveryPersonID); result.Error == nil {
+	deliveryPersonID := order.DeliveryPersonID
+	if result := DB.First(&deliveryPerson, deliveryPersonID); result.Error != nil {
+		println("Error with Dleivery Guy")
 		return &order, result.Error
 	}
 
+	deliveryPerson.OnDelivery = false
+	deliveryPerson.CurrentLoc = order.DeliveryArea
+	println(deliveryPerson.Profile.Email, deliveryPersonID)
+
 	err := DB.Transaction(func(tx *gorm.DB) error {
-		if result := tx.Model(&deliveryPerson).Update("on_delivery", "1").Where("id", order.DeliveryPersonID); result.Error != nil {
-			println("This is an error")
+		if result := tx.Save(&order); result.Error != nil {
+			println("This is an error 3")
 			return result.Error
 		}
 
-		if result := tx.Model(&deliveryPerson).Update("current_loc", order.DeliveryArea).Where("id", order.DeliveryPersonID); result.Error != nil {
-			println("This is an error")
+		if result := tx.Save(&deliveryPerson); result.Error != nil {
+			println("This is an error 1")
 			return result.Error
 		}
-
-		if result := tx.Model(&order).Update("status", "Delivered").Where("id", order.ID); result.Error != nil {
-			println("This is an error")
-			return result.Error
-		}
-
 		return nil
 	})
 

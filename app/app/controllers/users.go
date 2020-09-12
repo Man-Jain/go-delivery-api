@@ -80,16 +80,19 @@ func (c *Users) Register() revel.Result {
 				Password: hashedPassword,
 			},
 		}
+
 		obj.Validate(c.Validation)
 		if c.Validation.HasErrors() {
 			return c.RenderJSON(map[string]string{"status": "Invalid Parameters"})
 		}
+
 		_, err := services.InsertUser(obj)
 		if err != nil {
 			return c.RenderJSON(map[string]string{"status": "Invalid Request"})
 		}
 
 		return c.RenderJSON(obj)
+
 	} else {
 
 		obj := models.DeliveryPerson{
@@ -115,18 +118,22 @@ func (c *Users) Register() revel.Result {
 func (c *Users) RegisterRoot() revel.Result {
 	isAllowed, err := services.ValidateUser(c.Request.Header.Get("Authorization"), "root")
 	if !isAllowed {
-		// return c.RenderJSON(map[string]string{"status": "Not Authorised"})
+		return c.RenderJSON(map[string]string{"status": "Not Authorised"})
 	}
 
 	var jsonData map[string]interface{}
 	c.Params.BindJSON(&jsonData)
 
-	password := jsonData["password"].(string)
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	email, okEmail := jsonData["email"].(string)
+	password, okPass := jsonData["password"].(string)
+	if !okEmail || !okPass {
+		return c.RenderJSON(map[string]string{"status": "Invalid Parameters"})
+	}
 
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	obj := models.User{
 		Profile: models.Profile{
-			Email:    jsonData["email"].(string),
+			Email:    email,
 			Password: hashedPassword,
 		},
 		Root: true,
