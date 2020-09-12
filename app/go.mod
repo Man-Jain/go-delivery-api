@@ -25,7 +25,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/stack.v0 v0.0.0-20141108040640-9b43fcefddd0 // indirect
-	gorm.io/driver/postgres v1.0.0 // indirect
+	gorm.io/driver/postgres v1.0.0
 	gorm.io/driver/sqlite v1.1.1
 	gorm.io/gorm v1.20.0
 )

@@ -16,6 +16,9 @@ func InitDB() {
 	// dsn := "user=postgres password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
 	DB, err = gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
 
+	// dsn := "host=db user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
+	// DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
 	if err != nil {
 		panic("failed to connect database")
 	}

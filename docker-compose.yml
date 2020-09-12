@@ -1,0 +1,22 @@
+version: "3"
+services: 
+  db:
+    image: 'postgres:latest'
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - database_data:/var/lib/postgresql/data
+  web:
+    build: .
+    ports:
+      - '9000:9000'
+    depends_on:
+      - db
+    volumes: 
+        - ./:/delivery-api/
+volumes:
+    database_data:
