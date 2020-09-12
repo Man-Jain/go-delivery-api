@@ -1,1 +1,1 @@
-web: revel run -a app 
+web: revel run -a ./

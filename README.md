@@ -14,7 +14,7 @@ API Documentation - https://documenter.getpostman.com/view/11690738/TVK5dgjK
 
 1. Golang (Backend) / Revel Framework
 2. PostgreSQL (DB)
-3. Docker / Docker-Compose (Hosting)
+3. Docker / Docker-Compose (Hosting) and Heroku
 
 ### APIs Endpoints
 
