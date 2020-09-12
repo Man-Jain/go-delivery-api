@@ -18,8 +18,12 @@ func (c *Auth) Login() revel.Result {
 	var jsonData map[string]interface{}
 	c.Params.BindJSON(&jsonData)
 
-	email := jsonData["email"].(string)
-	password := jsonData["password"].(string)
+	email, okEmail := jsonData["email"].(string)
+	password, okPass := jsonData["password"].(string)
+
+	if !okEmail || !okPass {
+		return c.RenderJSON(map[string]string{"status": "Invalid Parameters"})
+	}
 
 	accessToken, refreshToken, err := services.LogIn(email, password)
 	if err != nil {
@@ -35,8 +39,12 @@ func (c *Auth) DeliveryLogin() revel.Result {
 	var jsonData map[string]interface{}
 	c.Params.BindJSON(&jsonData)
 
-	email := jsonData["email"].(string)
-	password := jsonData["password"].(string)
+	email, okEmail := jsonData["email"].(string)
+	password, okPass := jsonData["password"].(string)
+
+	if !okEmail || !okPass {
+		return c.RenderJSON(map[string]string{"status": "Invalid Parameters"})
+	}
 
 	accessToken, refreshToken, err := services.DeliveryLogIn(email, password)
 	if err != nil {

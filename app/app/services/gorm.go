@@ -2,7 +2,9 @@ package services
 
 import (
 	"app/app/models"
+	"os"
 
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -13,11 +15,15 @@ var DB *gorm.DB
 // InitDB initialises DB instance
 func InitDB() {
 	var err error
-	// dsn := "user=postgres password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
-	DB, err = gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
-
-	// dsn := "host=db user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
-	// DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	prod := os.Getenv("PROD")
+	if prod == "True" {
+		println("Using Postgres")
+		dsn := "host=db user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
+		DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	} else {
+		println("Using Sqlite")
+		DB, err = gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
+	}
 
 	if err != nil {
 		panic("failed to connect database")
