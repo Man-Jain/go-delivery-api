@@ -98,8 +98,15 @@ func (c *Orders) CreateOrder() revel.Result {
 
 	var jsonData map[string]interface{}
 	c.Params.BindJSON(&jsonData)
+	userID, okuid := jsonData["user_id"].(float64)
+	cookieID, okcid := jsonData["cookie_id"].(float64)
+	quantity, okqty := jsonData["quantity"].(float64)
 
-	order, err := services.InsertOrder(jsonData)
+	if !okuid || !okcid || !okqty {
+		return c.RenderJSON(map[string]string{"status": "Invalid Parameters"})
+	}
+
+	order, err := services.InsertOrder(uint(userID), uint(cookieID), uint(quantity))
 	if err != nil {
 		c.Response.Status = http.StatusBadRequest
 		return c.RenderJSON(map[string]string{"status": "Invalid Request"})

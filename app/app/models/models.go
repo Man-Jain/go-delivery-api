@@ -8,6 +8,7 @@ type Profile struct {
 	Email    string `gorm:"unique"`
 	MobileNo uint   // `gorm:"unique"`
 	Password []byte
+	Address  uint
 }
 
 // User model is for customers objects
@@ -33,6 +34,7 @@ type DeliveryPerson struct {
 	CurrentOrders []Order
 	// OrderArea     uint
 	CurrentLoc uint
+	OnDelivery bool
 }
 
 // Validate user Model

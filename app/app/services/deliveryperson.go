@@ -2,13 +2,15 @@ package services
 
 import (
 	"app/app/models"
+
+	"gorm.io/gorm"
 )
 
 // QueryAllDeliveryPeople return all users of application
 func QueryAllDeliveryPeople() (*[]models.DeliveryPerson, error) {
 	deliveryPeople := []models.DeliveryPerson{}
-	result := DB.Find(&deliveryPeople)
-	println(result)
+	result := DB.Preload("CurrentOrders").Find(&deliveryPeople)
+	println(deliveryPeople)
 	println(result.RowsAffected)
 	return &deliveryPeople, nil
 }
@@ -16,7 +18,7 @@ func QueryAllDeliveryPeople() (*[]models.DeliveryPerson, error) {
 // QueryDeliveryPerson return a single user object
 func QueryDeliveryPerson(id uint) (*models.DeliveryPerson, error) {
 	dp := models.DeliveryPerson{}
-	result := DB.First(&dp, id)
+	result := DB.Preload("CurrentOrders").First(&dp, id)
 	println(result.RowsAffected)
 	return &dp, nil
 }
@@ -34,10 +36,34 @@ func InsertDeliveryPerson(obj models.DeliveryPerson) (*models.DeliveryPerson, er
 // UpdateDelivery return a single user object
 func UpdateDelivery(id int) (*models.Order, error) {
 	order := models.Order{}
-	result := DB.First(&order, id)
+	if result := DB.First(&order, id); result.Error != nil {
+		return &order, result.Error
+	}
 	order.Status = "Delivered"
 
-	DB.Save(&order)
-	println(result.RowsAffected)
-	return &order, nil
+	deliveryPerson := models.DeliveryPerson{}
+	if result := DB.First(&deliveryPerson, order.DeliveryPersonID); result.Error == nil {
+		return &order, result.Error
+	}
+
+	err := DB.Transaction(func(tx *gorm.DB) error {
+		if result := tx.Model(&deliveryPerson).Update("on_delivery", "1").Where("id", order.DeliveryPersonID); result.Error != nil {
+			println("This is an error")
+			return result.Error
+		}
+
+		if result := tx.Model(&deliveryPerson).Update("current_loc", order.DeliveryArea).Where("id", order.DeliveryPersonID); result.Error != nil {
+			println("This is an error")
+			return result.Error
+		}
+
+		if result := tx.Model(&order).Update("status", "Delivered").Where("id", order.ID); result.Error != nil {
+			println("This is an error")
+			return result.Error
+		}
+
+		return nil
+	})
+
+	return &order, err
 }
