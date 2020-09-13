@@ -2,7 +2,7 @@
 
 [![PkgGoDev](https://pkg.go.dev/badge/Man-Jain/go-delivery-api)](https://pkg.go.dev/Man-Jain/go-delivery-api)
 
-The API is Hosted at - http://52.188.108.35:9000/
+The API is Hosted at - http://51.143.4.68:9000/
 
 The PostMan Collection of APIs for different endpoints - https://www.getpostman.com/collections/14835f5377649198b51b
 
